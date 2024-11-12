@@ -1,3 +1,5 @@
+import 'package:expansion_tile_card/expansion_tile_card.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -19,12 +21,20 @@ class Home extends StatefulWidget {
 class _MyHomePageState extends State<Home> {
   FirebaseAuth auth = FirebaseAuth.instance;
 
-  final Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance.collection('habitos').snapshots();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  final TextEditingController _textEditingController = TextEditingController();
+  final tituloController = TextEditingController();
+  final descripcionController = TextEditingController();
+  final fechaInicialController = TextEditingController();
+  final fechaFinalController = TextEditingController();
   final GlobalKey<ScaffoldState> _key = GlobalKey<ScaffoldState>();
 
 
   final _items = [
-    SalomonBottomBarItem(icon: const Icon(Icons.home), title: const Text('Menu'))
+    SalomonBottomBarItem(icon: const Icon(Icons.home), title: const Text('Inicio')),
+    SalomonBottomBarItem(icon: const Icon(Icons.stars_rounded), title: const Text('Retos'), selectedColor: Colors.lightGreen),
+    SalomonBottomBarItem(icon: const Icon(Icons.calendar_month_rounded), title: const Text('Calendario'), selectedColor: Colors.orangeAccent),
   ];
 
 
@@ -43,6 +53,26 @@ class _MyHomePageState extends State<Home> {
   Widget build(BuildContext context) {
     final User? user = auth.currentUser;
     final uid = user?.uid;
+
+    final Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance.collection('habitos').doc(uid).collection('habitos').snapshots();
+
+
+    CollectionReference users = FirebaseFirestore.instance.collection('habitos').doc(uid).collection('habitos');
+
+    Future<void> addReto() {
+
+      // Call the user's CollectionReference to add new Inventory.
+      return users
+          .add({
+        'titulo': (tituloController.text), // titulo del reto
+        'descripcion': descripcionController.text, // descripcion del reto
+        'fechaInicial': fechaInicialController.text, // Fecha inicial para comenzar el reto
+        'fechaFinal': fechaFinalController.text, // Fecha final para terminar el reto
+      })
+          .then((value) => print("reto agregado"))
+          .catchError((error) => print("Falla al agregar reto: $error"));
+    }
+
 
     return Scaffold(
       key: _key,
@@ -148,12 +178,17 @@ class _MyHomePageState extends State<Home> {
           ],
         ),
       ),
-      // bottomNavigationBar: BottomAppBar(
-      //
-      // ),
-      bottomNavigationBar: SalomonBottomBar(
-        items: _items,
+
+      //barra inferior
+      bottomNavigationBar: Card(
+        elevation: 6,
+        margin: const EdgeInsets.all(16),
+        child: SalomonBottomBar(
+          items: _items,
+        ),
       ),
+
+
       body: Center(
 
 
@@ -167,106 +202,352 @@ class _MyHomePageState extends State<Home> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    //GRID de BOTONES
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height*0.9,
-                      child: GridView.count(
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.width*0.02, horizontal: MediaQuery.of(context).size.width*0.2),
-                        childAspectRatio: (MediaQuery.of(context).size.width<500) ? 2 : 16/9,
-                        crossAxisCount: 1,
-                        crossAxisSpacing: MediaQuery.of(context).size.width*0.02,
-                        mainAxisSpacing: MediaQuery.of(context).size.width*0.04,
-                        children: <Widget>[
+                    Container(
 
-                          //PRIMER BOTON: Nuevo Reto
-                          Container(
-                            decoration:  BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    Stack(
+                      children: [
+                        //listado de retos recientes
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height*0.6,
+                          width: MediaQuery.of(context).size.width*1,
+                          child: Expanded(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: MediaQuery.sizeOf(context).width*0.05, vertical: MediaQuery.of(context).size.height*0.01),
+                              width: MediaQuery.sizeOf(context).width,
+                              decoration:  BoxDecoration(
+                                borderRadius: BorderRadius.all(Radius.circular(5)),
+                              ), // button width and height
+                              height: MediaQuery.sizeOf(context).height,
+                              // color: Colors.white,
+                              child: StreamBuilder<QuerySnapshot>(
+                                stream: _usersStream,
+                                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  if (snapshot.hasError) {
+                                    return const Text('Something went wrong');
+                                  }
 
-                            ), // button width and height
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.all(Radius.circular(15)),
-                              child: Material(
-                                shadowColor: Colors.grey,
-                                color: Colors.amber.shade200, // button color
-                                child: InkWell(
-                                  splashColor: Colors.amberAccent, // splash color
-                                  onTap: () {
+                                  if (snapshot.connectionState == ConnectionState.waiting) {
+                                    return Text("Loading");
+                                  }
 
-                                  }, // button pressed
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Icon(Icons.add_alarm_rounded), // icon
-                                      Text("Nuevo Reto"), // text
-                                    ],
-                                  ),
+
+                                  return ListView(
+                                    clipBehavior: Clip.none,
+                                    children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                                      Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+
+                                      return ExpansionTileCard(
+                                        baseColor: Theme.of(context).colorScheme.onInverseSurface,
+                                        expandedColor: Colors.lightGreen.shade100,
+                                        expandedTextColor: Colors.black,
+                                        initialPadding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height*0.01),
+                                        leading: ClipRRect(
+
+                                          borderRadius: BorderRadius.circular(8.0), child: Icon(Icons.star),),
+                                        // color: Colors.white,
+                                        title: Text(data['titulo']),
+                                        children: [
+                                          const Divider(
+                                            thickness: 1.0,
+                                            height: 1.0,
+                                          ),
+                                          Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 16.0,
+                                                vertical: 8.0,
+                                              ),
+                                              child: Text(data['descripcion'],
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium!
+                                                    .copyWith(fontSize: 16),
+                                              ),
+                                            ),
+                                          ),
+
+                                          ButtonBar(
+                                            alignment: MainAxisAlignment.spaceAround,
+                                            buttonHeight: 52.0,
+                                            buttonMinWidth: 90.0,
+                                            children: <Widget>[
+                                              TextButton(
+                                                // style: flatButtonStyle,
+                                                onPressed: () {
+                                                  // cardB.currentState?.expand();
+                                                },
+                                                child: const Column(
+                                                  children: <Widget>[
+                                                    Icon(Icons.border_color_outlined, color: Colors.blueAccent,),
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(vertical: 2.0),
+                                                    ),
+                                                    Text('Editar'),
+                                                  ],
+                                                ),
+                                              ),
+
+                                              TextButton(
+                                                // style: flatButtonStyle,
+                                                onPressed: () {
+                                                  // currentState?.toggleExpansion();
+                                                },
+                                                child: const Column(
+                                                  children: <Widget>[
+                                                    Icon(Icons.delete_forever, color: Colors.redAccent,),
+                                                    Padding(
+                                                      padding: EdgeInsets.symmetric(vertical: 2.0),
+                                                    ),
+                                                    Text('Eliminar'),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+
+                                        ],
+                                        // child: ListTile(
+                                        //   contentPadding: EdgeInsets.all(0),
+                                        //
+                                        //   leading: Image.network(data['imagen'], fit: BoxFit.fitWidth,),
+                                        //   title: ,
+                                        // ),
+                                      );
+                                    }).toList(),
+                                  );
+                                },
+                              ),
+                            ),
+
+                          ),
+                        ),
+
+                      ],
+                    ),
+
+                    //Boton para agregar retos
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: (MediaQuery.sizeOf(context).width<500) ? MediaQuery.sizeOf(context).width*0.05 : MediaQuery.sizeOf(context).width*0.05, vertical: MediaQuery.sizeOf(context).height*0.01),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          child: Material(
+                            shadowColor: Colors.black54,
+                            color: Colors.amberAccent, // button color
+                            child: InkWell(
+                              splashColor: Colors.amberAccent, // splash color
+                              onTap: () async {
+                                return await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      bool? isChecked = false;
+                                      return StatefulBuilder(builder: (context, setState) {
+                                        return AlertDialog(
+                                          content: Form(
+                                              key: _formKey,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+
+                                                  TextFormField(
+                                                    controller: tituloController,
+                                                    validator: (value) {
+                                                      return value!.isNotEmpty ? null : "Agregar Nombre";
+                                                    },
+                                                    decoration:
+                                                    InputDecoration(hintText: "Agregar Nombre"),
+                                                  ),
+                                                  TextFormField(
+                                                    controller: descripcionController,
+                                                    validator: (value) {
+                                                      return value!.isNotEmpty ? null : "Agregar Descripción";
+                                                    },
+                                                    decoration:
+                                                    InputDecoration(hintText: "Agregar Descripción"),
+                                                  ),
+
+                                                  // TextFormField(
+                                                  //   controller: imagenController,
+                                                  //   validator: (value) {
+                                                  //     return value!.isNotEmpty ? null : "Agregar Link de Imagen";
+                                                  //   },
+                                                  //   decoration:
+                                                  //   InputDecoration(hintText: "Agregar Link de Imagen"),
+                                                  // ),
+                                                  // ValueListenableBuilder(
+                                                  //     valueListenable: _image,
+                                                  //     builder: builder
+                                                  // ),
+
+
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text("Choice Box"),
+                                                      Checkbox(
+                                                          value: isChecked,
+                                                          onChanged: (checked) {
+                                                            setState(() {
+                                                              isChecked = checked;
+                                                            });
+                                                          })
+                                                    ],
+                                                  )
+                                                ],
+                                              )),
+                                          title: Text('Agregar Inventario'),
+                                          actions: <Widget>[
+                                            InkWell(
+                                              child: Text('CANCELAR   '),
+                                              onTap: () {
+
+                                                Navigator.of(context).pop();
+
+                                              },
+                                            ),
+                                            InkWell(
+                                              child: Text('OK   '),
+                                              onTap: () async {
+                                                if (_formKey.currentState!.validate()) {
+                                                  var imageName = DateTime.now().millisecondsSinceEpoch.toString();
+
+                                                  await addReto();
+
+                                                  Navigator.of(context).pop();
+
+                                                }
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      });
+                                    });
+                              }, // button pressed
+                              child:
+                              const SizedBox(
+                                width: 50,
+                                height: 50,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Icon(Icons.add_circle_outline_rounded), // icon
+                                    // Text("Agregar", style: TextStyle(color: Colors.white),), // text
+                                  ],
                                 ),
                               ),
                             ),
                           ),
-
-
-                          //SEGUNDO BOTON: Retos
-                          Container(
-                            decoration:  BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-
-                            ), // button width and height
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.all(Radius.circular(15)),
-                              child: Material(
-                                shadowColor: Colors.black54,
-                                color: Colors.lightGreen, // button color
-                                child: InkWell(
-                                  splashColor: Colors.blueAccent, // splash color
-                                  onTap: () {}, // button pressed
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Icon(Icons.stars_rounded), // icon
-                                      Text("Retos"), // text
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          //TERCER BOTON: Personal
-                          Container(
-                            decoration:  BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-
-                            ), // button width and height
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.all(Radius.circular(15)),
-                              child: Material(
-                                shadowColor: Colors.black,
-                                color: Colors.orangeAccent.shade200, // button color
-                                child: InkWell(
-                                  splashColor: Colors.orange, // splash color
-                                  onTap: () {}, // button pressed
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Icon(Icons.calendar_month_rounded), // icon
-                                      Text("Calendario"), // text
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-
-
-
-
-
-                        ],
+                        ),
                       ),
-                ),
+                    ),
+                    
+                    
+
+
+
+                    //GRID de BOTONES
+                //     SizedBox(
+                //       height: MediaQuery.of(context).size.height*0.9,
+                //       child: GridView.count(
+                //         physics: const NeverScrollableScrollPhysics(),
+                //         padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.width*0.02, horizontal: MediaQuery.of(context).size.width*0.2),
+                //         childAspectRatio: (MediaQuery.of(context).size.width<500) ? 2 : 16/9,
+                //         crossAxisCount: 1,
+                //         crossAxisSpacing: MediaQuery.of(context).size.width*0.02,
+                //         mainAxisSpacing: MediaQuery.of(context).size.width*0.04,
+                //         children: <Widget>[
+                //
+                //           //PRIMER BOTON: Nuevo Reto
+                //           Container(
+                //             decoration:  BoxDecoration(
+                //               borderRadius: BorderRadius.all(Radius.circular(10)),
+                //
+                //             ), // button width and height
+                //             child: ClipRRect(
+                //               borderRadius: BorderRadius.all(Radius.circular(15)),
+                //               child: Material(
+                //                 shadowColor: Colors.grey,
+                //                 color: Colors.amber.shade200, // button color
+                //                 child: InkWell(
+                //                   splashColor: Colors.amberAccent, // splash color
+                //                   onTap: () {
+                //
+                //                   }, // button pressed
+                //                   child: Column(
+                //                     mainAxisAlignment: MainAxisAlignment.center,
+                //                     children: <Widget>[
+                //                       Icon(Icons.add_alarm_rounded), // icon
+                //                       Text("Nuevo Reto"), // text
+                //                     ],
+                //                   ),
+                //                 ),
+                //               ),
+                //             ),
+                //           ),
+                //
+                //
+                //           //SEGUNDO BOTON: Retos
+                //           Container(
+                //             decoration:  BoxDecoration(
+                //               borderRadius: BorderRadius.all(Radius.circular(10)),
+                //
+                //             ), // button width and height
+                //             child: ClipRRect(
+                //               borderRadius: BorderRadius.all(Radius.circular(15)),
+                //               child: Material(
+                //                 shadowColor: Colors.black54,
+                //                 color: Colors.lightGreen, // button color
+                //                 child: InkWell(
+                //                   splashColor: Colors.blueAccent, // splash color
+                //                   onTap: () {}, // button pressed
+                //                   child: Column(
+                //                     mainAxisAlignment: MainAxisAlignment.center,
+                //                     children: <Widget>[
+                //                       Icon(Icons.stars_rounded), // icon
+                //                       Text("Retos"), // text
+                //                     ],
+                //                   ),
+                //                 ),
+                //               ),
+                //             ),
+                //           ),
+                //
+                //           //TERCER BOTON: Personal
+                //           Container(
+                //             decoration:  BoxDecoration(
+                //               borderRadius: BorderRadius.all(Radius.circular(10)),
+                //
+                //             ), // button width and height
+                //             child: ClipRRect(
+                //               borderRadius: BorderRadius.all(Radius.circular(15)),
+                //               child: Material(
+                //                 shadowColor: Colors.black,
+                //                 color: Colors.orangeAccent.shade200, // button color
+                //                 child: InkWell(
+                //                   splashColor: Colors.orange, // splash color
+                //                   onTap: () {}, // button pressed
+                //                   child: Column(
+                //                     mainAxisAlignment: MainAxisAlignment.center,
+                //                     children: <Widget>[
+                //                       Icon(Icons.calendar_month_rounded), // icon
+                //                       Text("Calendario"), // text
+                //                     ],
+                //                   ),
+                //                 ),
+                //               ),
+                //             ),
+                //           ),
+                //
+                //
+                //
+                //
+                //
+                //         ],
+                //       ),
+                // ),
                   ],
                 ),
               ),
