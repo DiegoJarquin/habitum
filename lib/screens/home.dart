@@ -239,7 +239,7 @@ class _MyHomePageState extends State<Home> {
 
                                       return ExpansionTileCard(
                                         baseColor: Theme.of(context).colorScheme.onInverseSurface,
-                                        expandedColor: Colors.lightGreen.shade100,
+                                        expandedColor: Theme.of(context).colorScheme.onInverseSurface.withBlue(200),
                                         expandedTextColor: Colors.black,
                                         initialPadding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height*0.01),
                                         leading: ClipRRect(
@@ -280,7 +280,7 @@ class _MyHomePageState extends State<Home> {
                                                 },
                                                 child: const Column(
                                                   children: <Widget>[
-                                                    Icon(Icons.border_color_outlined, color: Colors.blueAccent,),
+                                                    Icon(Icons.border_color_outlined, color: Colors.indigoAccent,),
                                                     Padding(
                                                       padding: EdgeInsets.symmetric(vertical: 2.0),
                                                     ),
@@ -333,10 +333,11 @@ class _MyHomePageState extends State<Home> {
                       child: Container(
                         padding: EdgeInsets.symmetric(horizontal: (MediaQuery.sizeOf(context).width<500) ? MediaQuery.sizeOf(context).width*0.05 : MediaQuery.sizeOf(context).width*0.05, vertical: MediaQuery.sizeOf(context).height*0.01),
                         child: ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                          borderRadius: BorderRadius.all(Radius.circular(16)),
                           child: Material(
+                            elevation: 10,
                             shadowColor: Colors.black54,
-                            color: Colors.amberAccent, // button color
+                            color: Colors.amberAccent.shade100, // button color
                             child: InkWell(
                               splashColor: Colors.amberAccent, // splash color
                               onTap: () async {
