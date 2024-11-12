@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "452262292182",
+    "project_id": "habitum-477dc",
+    "storage_bucket": "habitum-477dc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:452262292182:android:322bab5d8326cdf56fb777",
+        "android_client_info": {
+          "package_name": "com.example.habitum"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBT8FxIvTIItvjdKHfhq_RLF_QxsIgaMBM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:452262292182:android:aab4978b261864de6fb777",
+        "android_client_info": {
+          "package_name": "com.habitum.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBT8FxIvTIItvjdKHfhq_RLF_QxsIgaMBM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
