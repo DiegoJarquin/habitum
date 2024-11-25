@@ -41,6 +41,7 @@ dependencies:
   cloud_firestore: ^5.4.5
   salomon_bottom_bar: ^3.3.2
   expansion_tile_card: ^3.0.0
+  custom_date_range_picker: ^1.1.0
 
 dev_dependencies:
   flutter_test:
