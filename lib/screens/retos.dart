@@ -168,7 +168,6 @@ class _RetosState extends State<Retos> {
                                                 );
                                               }
 
-
                                             }, // button pressed
                                             child:
                                             SizedBox(
