@@ -42,6 +42,8 @@ dependencies:
   salomon_bottom_bar: ^3.3.2
   expansion_tile_card: ^3.0.0
   custom_date_range_picker: ^1.1.0
+  syncfusion_flutter_charts: ^27.2.4
+  syncfusion_flutter_gauges: ^27.2.4
 
 dev_dependencies:
   flutter_test:
