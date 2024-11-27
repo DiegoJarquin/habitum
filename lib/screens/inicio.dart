@@ -106,6 +106,7 @@ class _MyHomePageState extends State<Inicio> {
                                       }
                                     });
 
+
                                     print('Completados: ' + completados.toString() + ' / ' + snapshot.data!.docs.length.toString());
                                     return SfRadialGauge(axes: <RadialAxis>[
                                       RadialAxis(
