@@ -86,6 +86,9 @@ class _MyHomePageState extends State<Home> {
           .catchError((error) => print("Falla al agregar reto: $error"));
     }
 
+    //TODO main menu para ver porcentaje de habitos completados y habitos no completados y mostrar los pendientes del dia
+    //TODO retos mostrar todos (completados y no completados)
+    //TODO calendario mostrar todos los habitos y retos en un calendario
 
     return Scaffold(
       key: _key,
