@@ -75,7 +75,7 @@ class _RetosState extends State<Retos> {
 
 
         child: Container(
-          //TODO MAIN MENU
+          //TODO retos completados
             child: Expanded(
               child: SingleChildScrollView(
 
@@ -458,106 +458,7 @@ class _RetosState extends State<Retos> {
 
 
 
-                    //GRID de BOTONES
-                    //     SizedBox(
-                    //       height: MediaQuery.of(context).size.height*0.9,
-                    //       child: GridView.count(
-                    //         physics: const NeverScrollableScrollPhysics(),
-                    //         padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.width*0.02, horizontal: MediaQuery.of(context).size.width*0.2),
-                    //         childAspectRatio: (MediaQuery.of(context).size.width<500) ? 2 : 16/9,
-                    //         crossAxisCount: 1,
-                    //         crossAxisSpacing: MediaQuery.of(context).size.width*0.02,
-                    //         mainAxisSpacing: MediaQuery.of(context).size.width*0.04,
-                    //         children: <Widget>[
-                    //
-                    //           //PRIMER BOTON: Nuevo Reto
-                    //           Container(
-                    //             decoration:  BoxDecoration(
-                    //               borderRadius: BorderRadius.all(Radius.circular(10)),
-                    //
-                    //             ), // button width and height
-                    //             child: ClipRRect(
-                    //               borderRadius: BorderRadius.all(Radius.circular(15)),
-                    //               child: Material(
-                    //                 shadowColor: Colors.grey,
-                    //                 color: Colors.amber.shade200, // button color
-                    //                 child: InkWell(
-                    //                   splashColor: Colors.amberAccent, // splash color
-                    //                   onTap: () {
-                    //
-                    //                   }, // button pressed
-                    //                   child: Column(
-                    //                     mainAxisAlignment: MainAxisAlignment.center,
-                    //                     children: <Widget>[
-                    //                       Icon(Icons.add_alarm_rounded), // icon
-                    //                       Text("Nuevo Reto"), // text
-                    //                     ],
-                    //                   ),
-                    //                 ),
-                    //               ),
-                    //             ),
-                    //           ),
-                    //
-                    //
-                    //           //SEGUNDO BOTON: Retos
-                    //           Container(
-                    //             decoration:  BoxDecoration(
-                    //               borderRadius: BorderRadius.all(Radius.circular(10)),
-                    //
-                    //             ), // button width and height
-                    //             child: ClipRRect(
-                    //               borderRadius: BorderRadius.all(Radius.circular(15)),
-                    //               child: Material(
-                    //                 shadowColor: Colors.black54,
-                    //                 color: Colors.lightGreen, // button color
-                    //                 child: InkWell(
-                    //                   splashColor: Colors.blueAccent, // splash color
-                    //                   onTap: () {}, // button pressed
-                    //                   child: Column(
-                    //                     mainAxisAlignment: MainAxisAlignment.center,
-                    //                     children: <Widget>[
-                    //                       Icon(Icons.stars_rounded), // icon
-                    //                       Text("Retos"), // text
-                    //                     ],
-                    //                   ),
-                    //                 ),
-                    //               ),
-                    //             ),
-                    //           ),
-                    //
-                    //           //TERCER BOTON: Personal
-                    //           Container(
-                    //             decoration:  BoxDecoration(
-                    //               borderRadius: BorderRadius.all(Radius.circular(10)),
-                    //
-                    //             ), // button width and height
-                    //             child: ClipRRect(
-                    //               borderRadius: BorderRadius.all(Radius.circular(15)),
-                    //               child: Material(
-                    //                 shadowColor: Colors.black,
-                    //                 color: Colors.orangeAccent.shade200, // button color
-                    //                 child: InkWell(
-                    //                   splashColor: Colors.orange, // splash color
-                    //                   onTap: () {}, // button pressed
-                    //                   child: Column(
-                    //                     mainAxisAlignment: MainAxisAlignment.center,
-                    //                     children: <Widget>[
-                    //                       Icon(Icons.calendar_month_rounded), // icon
-                    //                       Text("Calendario"), // text
-                    //                     ],
-                    //                   ),
-                    //                 ),
-                    //               ),
-                    //             ),
-                    //           ),
-                    //
-                    //
-                    //
-                    //
-                    //
-                    //         ],
-                    //       ),
-                    // ),
+
                   ],
                 ),
               ),
