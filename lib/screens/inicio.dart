@@ -257,7 +257,7 @@ class _MyHomePageState extends State<Inicio> {
                                         vertical: 8.0,
                                       ),
                                       child: Text(
-                                        (data['frecuencia']==1) ? 'Diario' : 'Semanal', style: TextStyle(color: data['frecuencia']==1 ? Colors.green : Colors.red),),
+                                        (data['frecuencia']==1) ? 'Diario' : 'Semanal', style: TextStyle(color: data['frecuencia']==1 ? Colors.indigoAccent : Colors.indigoAccent),),
                                     ),
                                   ),
 
