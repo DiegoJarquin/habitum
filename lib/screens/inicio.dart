@@ -56,11 +56,13 @@ class _MyHomePageState extends State<Inicio> {
 
       return users
           .doc(docId).update({
+        'completadoCounter': FieldValue.increment(1),
         'completado': true, //reto completado
       })
           .then((value) => print("reto completo"))
           .catchError((error) => print("Falla al agregar reto: $error"));
     }
+
 
     return Scaffold(
 
@@ -108,7 +110,7 @@ class _MyHomePageState extends State<Inicio> {
                               axes: <RadialAxis>[
                                 RadialAxis(
                                     minimum: 0,
-                                    maximum: snapshot.data!.docs.length.toDouble(),
+                                    maximum: (snapshot.data!.docs.isNotEmpty) ? snapshot.data!.docs.length.toDouble() : 1,
                                     showLabels: false,
                                     showTicks: false,
                                     axisLineStyle: const AxisLineStyle(
@@ -118,6 +120,7 @@ class _MyHomePageState extends State<Inicio> {
                                     ),
                                     pointers: <GaugePointer>[
                                       RangePointer(
+                                        color: Colors.lightGreen,
                                         value: completados,
                                         width: 0.2,
                                         sizeUnit: GaugeSizeUnit.factor,
@@ -139,7 +142,7 @@ class _MyHomePageState extends State<Inicio> {
                                               ),
                                               const Text(
                                                 textAlign: TextAlign.center,
-                                                'Hábitos\nCompletados',
+                                                'Retos\nCompletados',
                                                 style: TextStyle(
                                                     fontSize: 20,
                                                     fontWeight: FontWeight.bold),
@@ -160,7 +163,17 @@ class _MyHomePageState extends State<Inicio> {
 
                   ),
                 ),
-
+                SizedBox(
+                  width: MediaQuery.of(context).size.width*0.5,
+                  child: Divider(
+                    color: Colors.grey,
+                    thickness: 1,
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width*0.5,
+                  child: Text('Retos\nPendientes', textAlign: TextAlign.center, style: TextStyle(fontSize: 20),),
+                ),
                 // LISTA DE RETOS Sin Completar
                 SizedBox(
                   // height: MediaQuery.of(context).size.height*0.6,
@@ -236,6 +249,19 @@ class _MyHomePageState extends State<Inicio> {
                                     thickness: 1.0,
                                     height: 1.0,
                                   ),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0,
+                                        vertical: 8.0,
+                                      ),
+                                      child: Text(
+                                        (data['frecuencia']==1) ? 'Diario' : 'Semanal', style: TextStyle(color: data['frecuencia']==1 ? Colors.green : Colors.red),),
+                                    ),
+                                  ),
+
+
                                   Align(
                                     alignment: Alignment.centerLeft,
                                     child: Padding(

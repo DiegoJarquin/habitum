@@ -44,6 +44,7 @@ dependencies:
   custom_date_range_picker: ^1.1.0
   syncfusion_flutter_charts: ^27.2.4
   syncfusion_flutter_gauges: ^27.2.4
+  cloud_functions: ^5.1.5
 
 dev_dependencies:
   flutter_test:

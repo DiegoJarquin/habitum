@@ -27,11 +27,14 @@ class _RetosState extends State<Retos> {
   DateTime? endDate;
   bool isChecked = false;
   DateTime? createdDate;
+  int difference = 0;
+
+  bool _completos = false;
 
   @override
   Widget build(BuildContext context) {
     final uid = widget.uid;
-    final Stream<QuerySnapshot> _usersStreamFalse = FirebaseFirestore.instance.collection('habitos').doc(uid).collection('habitos').where('completado', isEqualTo: false).snapshots();
+    final Stream<QuerySnapshot> _usersStreamFalse = FirebaseFirestore.instance.collection('habitos').doc(uid).collection('habitos').orderBy('creacion', descending: false).snapshots();
     final Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance.collection('habitos').doc(uid).collection('habitos').where('completado', isEqualTo: true).snapshots();
     CollectionReference users = FirebaseFirestore.instance.collection('habitos').doc(uid).collection('habitos');
 
@@ -47,6 +50,8 @@ class _RetosState extends State<Retos> {
         'frecuencia': _frecuencia, //frecuencia de repeticion
         'creacion': createdDate, //fecha de creacion
         'completado': false, //reto completado
+        'completadoCounter': 0, //contador de retos completados
+        'diasCounter': difference, //dias de duracion del reto
       })
           .then((value) => print("reto agregado"))
           .catchError((error) => print("Falla al agregar reto: $error"));
@@ -56,6 +61,7 @@ class _RetosState extends State<Retos> {
 
       return users
           .doc(docId).update({
+        'completadoCounter': FieldValue.increment(1),
         'completado': true, //reto completado
       })
           .then((value) => print("reto completo"))
@@ -66,6 +72,7 @@ class _RetosState extends State<Retos> {
 
       return users
           .doc(docId).update({
+        'completadoCounter': FieldValue.increment(-1),
         'completado': false, //reto descompleto
       })
           .then((value) => print("reto descompleto"))
@@ -89,12 +96,13 @@ class _RetosState extends State<Retos> {
 
                   children: [
                     SizedBox(
+                      height: MediaQuery.of(context).size.height*0.05,
                       width: MediaQuery.of(context).size.width*0.5,
-                      child: Text('Retos\nSin Completar', textAlign: TextAlign.center, style: TextStyle(fontSize: 20),),
+                      child: const Text('Retos', textAlign: TextAlign.center, style: TextStyle(fontSize: 20),),
                     ),
                     Expanded(
                         child: StreamBuilder<QuerySnapshot>(
-                          stream: _usersStreamFalse,
+                          stream: (_completos) ? _usersStream : _usersStreamFalse,
                           builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                             if (snapshot.hasError) {
                               return const Text('Something went wrong');
@@ -111,7 +119,7 @@ class _RetosState extends State<Retos> {
                               // clipBehavior: Clip.none,
                               children: snapshot.data!.docs.map((DocumentSnapshot document) {
                                 Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-
+                                // double val = data['completadoCounter']/data['diasCounter'];
                                 return ExpansionTileCard(
                                   baseColor: Theme.of(context).colorScheme.onInverseSurface,
                                   expandedColor: Theme.of(context).colorScheme.onInverseSurface.withBlue(200),
@@ -183,6 +191,23 @@ class _RetosState extends State<Retos> {
                                     const Divider(
                                       thickness: 1.0,
                                       height: 1.0,
+                                    ),
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16.0,
+                                          vertical: 8.0,
+                                        ),
+                                        child: Text(
+                                          (data['frecuencia']==1) ? 'Diario' : 'Semanal', style: TextStyle(color: data['frecuencia']==1 ? Colors.indigoAccent : Colors.indigoAccent),),
+                                      ),
+                                    ),
+                                    LinearProgressIndicator(
+                                      value: 0.7, // progress
+                                      backgroundColor: Colors.grey[300],
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.lightGreen),
+                                      minHeight: 10.0, // Minimum height of the line
                                     ),
                                     Align(
                                       alignment: Alignment.centerLeft,
@@ -303,21 +328,24 @@ class _RetosState extends State<Retos> {
                               child: Material(
                                 elevation: 10,
                                 shadowColor: Colors.black54,
-                                color: Colors.lightGreen.shade100, // button color
+                                color: (_completos) ? Colors.orangeAccent.shade100 : Colors.lightGreen.shade100, // button color
                                 child: InkWell(
                                   splashColor: Colors.amberAccent, // splash color
                                   onTap: () {
-                                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => RetosCompletos(uid: uid)));
+                                    setState(() {
+                                      _completos = !_completos;
+
+                                    });
+                                    // Navigator.of(context).push(MaterialPageRoute(builder: (context) => RetosCompletos(uid: uid)));
                                   }, // button pressed
                                   child:
-                                   const SizedBox(
+                                  SizedBox(
                                     width: 100,
                                     height: 50,
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        Icon(Icons.star,), // icon
-                                        Text("completos", style: TextStyle(),), // text
+                                      children: <Widget>[ // icon
+                                        (_completos) ? Text("Ver Todos", style: TextStyle(),) : Text("Ver\nCompletos", textAlign: TextAlign.center,style: TextStyle(),), // text
                                       ],
                                     ),
                                   ),
@@ -417,6 +445,11 @@ class _RetosState extends State<Retos> {
                                                                 setState(() {
                                                                   endDate = end;
                                                                   startDate = start;
+
+                                                                  if(endDate!=null&&startDate!=null){
+                                                                    difference = endDate!.difference(startDate!).inDays;
+                                                                  }
+
                                                                 });
                                                               },
                                                               onCancelClick: () {
