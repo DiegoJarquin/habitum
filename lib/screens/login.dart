@@ -7,9 +7,7 @@ import 'crear_cuenta.dart';
 import 'home.dart';
 
 class Login extends StatefulWidget {
-  const Login({required this.navigatorKey});
 
-  final GlobalKey<NavigatorState> navigatorKey;
 
   @override
   State<Login> createState() => _MyHomePageState();

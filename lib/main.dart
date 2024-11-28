@@ -18,19 +18,16 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  final GlobalKey<NavigatorState> outgoingKey = GlobalKey<NavigatorState>();
    MyApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/',
-      routes: {
-        '/login': (context) => Login(navigatorKey: outgoingKey,),
-        '/home': (context) => const Home(title: ''),
-      },
       title: 'Flutter',
+      routes: {
+        '/login': (context) => Login(),
+      },
       theme: ThemeData(
         textTheme: GoogleFonts.ubuntuTextTheme(),
         useMaterial3: true,
@@ -44,15 +41,13 @@ class MyApp extends StatelessWidget {
     ),
 
       themeMode: ThemeMode.system,
-      home: MyHomePage(navigatorKey: outgoingKey),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.navigatorKey});
 
-  final GlobalKey<NavigatorState> navigatorKey;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -67,16 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return  Scaffold(
 
-      body: Navigator(
-        key: widget.navigatorKey,
-        onGenerateRoute: (settings) {
-          return MaterialPageRoute(
-            builder: (context) {
-              return Login(navigatorKey: widget.navigatorKey);
-            },
-          );
-        },
-      )
+      body: Login()
 
     );
   }

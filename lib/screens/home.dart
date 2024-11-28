@@ -199,7 +199,8 @@ class _MyHomePageState extends State<Home> {
                 // Update the state of the app
                 _onItemTapped(3);
                 // Then close the drawer
-                Navigator.of(context).popUntil(ModalRoute.withName('/'));
+                Navigator.of(context).pushNamedAndRemoveUntil('/login', (r) => r == null);
+
               },
             ),
           ],
