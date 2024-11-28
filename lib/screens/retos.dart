@@ -1,7 +1,10 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:custom_date_range_picker/custom_date_range_picker.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:habitum/screens/retoscompletos.dart';
 
@@ -86,14 +89,14 @@ class _RetosState extends State<Retos> {
 
 
         child: Container(
-          //TODO retos completados
+
             child: Stack(
               alignment: Alignment.center,
               // mainAxisAlignment: MainAxisAlignment.center,
               // crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Column(
-
+                  //TODO retos completados
                   children: [
                     SizedBox(
                       height: MediaQuery.of(context).size.height*0.05,
@@ -203,12 +206,23 @@ class _RetosState extends State<Retos> {
                                           (data['frecuencia']==1) ? 'Diario' : 'Semanal', style: TextStyle(color: data['frecuencia']==1 ? Colors.indigoAccent : Colors.indigoAccent),),
                                       ),
                                     ),
-                                    LinearProgressIndicator(
-                                      value: 0.7, // progress
-                                      backgroundColor: Colors.grey[300],
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.lightGreen),
-                                      minHeight: 10.0, // Minimum height of the line
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16.0,
+                                          vertical: 8.0,
+                                        ),
+                                        child: LinearProgressIndicator(
+                                          value: (data['sinfin'])? 0 : (data['completadoCounter'] / data['diasCounter']), // progress
+                                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                                          backgroundColor: Colors.grey[300],
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.lightGreen),
+                                          minHeight: 10.0, // Minimum height of the line
+                                        ),
+                                      ),
                                     ),
+
                                     Align(
                                       alignment: Alignment.centerLeft,
                                       child: Padding(
@@ -312,13 +326,13 @@ class _RetosState extends State<Retos> {
                   ],
                 ),
 
-
+                //TODO Botones
                 Stack(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        //Boton vista de completados
+                        //TODO BOTON VER COMPLETOS
                         Align(
                           alignment: Alignment.bottomLeft,
                           child: Container(
@@ -354,7 +368,9 @@ class _RetosState extends State<Retos> {
                             ),
                           ),
                         ),
-                        //agregar retos
+
+
+                        //TODO BOTON AGREGAR RETOS
                         Align(
                           alignment: Alignment.bottomRight,
                           child: Container(
@@ -392,7 +408,7 @@ class _RetosState extends State<Retos> {
                                                             onChanged: i == 3 ? null : (int? value) {
                                                               setState(() {
                                                                 _frecuencia = value!;
-                                                                print(_frecuencia);
+
                                                               });
                                                             },
                                                           ),
@@ -435,7 +451,7 @@ class _RetosState extends State<Retos> {
                                                             showCustomDateRangePicker(
                                                               context,
                                                               dismissible: true,
-                                                              minimumDate: DateTime.now().subtract(const Duration(days: 30)),
+                                                              minimumDate: DateTime.now(),
                                                               maximumDate: DateTime.now().add(const Duration(days: 30)),
                                                               endDate: endDate,
                                                               startDate: startDate,
@@ -466,6 +482,8 @@ class _RetosState extends State<Retos> {
 
                                                       ),
 
+                                                      (endDate!=null&&!isChecked) ? Text(DateFormat('dd/MM/yyyy').format(startDate!)+" - "+DateFormat('dd/MM/yyyy').format(endDate!)) : Text(""),
+
 
 
 
@@ -474,7 +492,7 @@ class _RetosState extends State<Retos> {
                                               title: const Text('Agregar Reto'),
                                               actions: <Widget>[
                                                 InkWell(
-                                                  child: const Text('CANCELAR   '),
+                                                  child: const Text('CANCELAR   ', style: TextStyle(fontWeight: FontWeight.bold),),
                                                   onTap: () {
 
                                                     Navigator.of(context).pop();
@@ -482,16 +500,27 @@ class _RetosState extends State<Retos> {
                                                   },
                                                 ),
                                                 InkWell(
-                                                  child: const Text('OK   '),
+                                                  child: const Text('OK   ', style: TextStyle(fontWeight: FontWeight.bold)),
                                                   onTap: () async {
-                                                    if (_formKey.currentState!.validate()) {
+                                                    if (_formKey.currentState!.validate()&&isChecked) {
+
+
+                                                      if(isChecked){
+                                                        endDate = null;
+                                                        startDate = null;
+                                                      }
                                                       createdDate = new DateTime.now();
-                                                      var imageName = DateTime.now().millisecondsSinceEpoch.toString();
 
                                                       await addReto();
 
                                                       Navigator.of(context).pop();
 
+                                                    }else if(_formKey.currentState!.validate()&&endDate!=null){
+                                                      createdDate = new DateTime.now();
+
+                                                      await addReto();
+
+                                                      Navigator.of(context).pop();
                                                     }
                                                   },
                                                 ),

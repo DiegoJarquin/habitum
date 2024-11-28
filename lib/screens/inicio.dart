@@ -69,8 +69,6 @@ class _MyHomePageState extends State<Inicio> {
       body: Center(
 
 
-
-        child: Expanded(
           child: SingleChildScrollView(
 
             child: Column(
@@ -261,7 +259,22 @@ class _MyHomePageState extends State<Inicio> {
                                     ),
                                   ),
 
-
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16.0,
+                                        vertical: 8.0,
+                                      ),
+                                      child: LinearProgressIndicator(
+                                        value: (data['sinfin'])? 0 : (data['completadoCounter'] / data['diasCounter']), // progress
+                                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                                        backgroundColor: Colors.grey[300],
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.lightGreen),
+                                        minHeight: 10.0, // Minimum height of the line
+                                      ),
+                                    ),
+                                  ),
                                   Align(
                                     alignment: Alignment.centerLeft,
                                     child: Padding(
@@ -366,7 +379,7 @@ class _MyHomePageState extends State<Inicio> {
               ],
             ),
           ),
-        )
+
 
       ),
 
