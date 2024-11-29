@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -31,6 +32,11 @@ class _RetosState extends State<Retos> {
   bool isChecked = false;
   DateTime? createdDate;
   int difference = 0;
+  late var colorValues = [
+  ];
+
+
+
 
   bool _completos = false;
 
@@ -55,6 +61,7 @@ class _RetosState extends State<Retos> {
         'completado': false, //reto completado
         'completadoCounter': 0, //contador de retos completados
         'diasCounter': difference, //dias de duracion del reto
+        'color': colorValues,
       })
           .then((value) => print("reto agregado"))
           .catchError((error) => print("Falla al agregar reto: $error"));
@@ -96,7 +103,7 @@ class _RetosState extends State<Retos> {
               // crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Column(
-                  //TODO retos completados
+                  //TODO retos
                   children: [
                     SizedBox(
                       height: MediaQuery.of(context).size.height*0.05,
@@ -122,9 +129,18 @@ class _RetosState extends State<Retos> {
                               // clipBehavior: Clip.none,
                               children: snapshot.data!.docs.map((DocumentSnapshot document) {
                                 Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-                                // double val = data['completadoCounter']/data['diasCounter'];
+
+
+
+
                                 return ExpansionTileCard(
-                                  baseColor: Theme.of(context).colorScheme.onInverseSurface,
+                                  baseColor: Color.fromARGB(
+                                    255,
+                                    data['color'][1],
+                                    data['color'][2],
+                                    data['color'][3],
+                                  ),
+                                  // baseColor: Theme.of(context).colorScheme.onInverseSurface,
                                   expandedColor: Theme.of(context).colorScheme.onInverseSurface.withBlue(200),
                                   expandedTextColor: Colors.black,
                                   initialPadding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height*0.01),
@@ -313,6 +329,14 @@ class _RetosState extends State<Retos> {
                                     ),
 
                                   ],
+                                  // trailing: Container(
+                                  //   color: Color.fromARGB(
+                                  //     255,
+                                  //     data['color'][1],
+                                  //     data['color'][2],
+                                  //     data['color'][3],
+                                  //   ),
+                                  // ),
 
                                 );
                               }).toList(),
@@ -510,6 +534,18 @@ class _RetosState extends State<Retos> {
                                                         startDate = null;
                                                       }
                                                       createdDate = new DateTime.now();
+                                                      final randomColor = Color.fromARGB(
+                                                        255,
+                                                        Random().nextInt(50) + 205,
+                                                        Random().nextInt(50) + 205,
+                                                        Random().nextInt(50) + 205,
+                                                      );
+                                                      colorValues = [
+                                                        randomColor.alpha,
+                                                        randomColor.red,
+                                                        randomColor.green,
+                                                        randomColor.blue
+                                                      ];
 
                                                       await addReto();
 
@@ -517,6 +553,18 @@ class _RetosState extends State<Retos> {
 
                                                     }else if(_formKey.currentState!.validate()&&endDate!=null){
                                                       createdDate = new DateTime.now();
+                                                      final randomColor = Color.fromARGB(
+                                                        255,
+                                                        Random().nextInt(50) + 205,
+                                                        Random().nextInt(50) + 205,
+                                                        Random().nextInt(50) + 205,
+                                                      );
+                                                      colorValues = [
+                                                        randomColor.alpha,
+                                                        randomColor.red,
+                                                        randomColor.green,
+                                                        randomColor.blue
+                                                      ];
 
                                                       await addReto();
 

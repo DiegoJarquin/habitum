@@ -45,6 +45,8 @@ dependencies:
   syncfusion_flutter_charts: ^27.2.4
   syncfusion_flutter_gauges: ^27.2.4
   cloud_functions: ^5.1.5
+  firebase_messaging: ^15.1.5
+  syncfusion_flutter_calendar: ^27.2.4
 
 dev_dependencies:
   flutter_test:

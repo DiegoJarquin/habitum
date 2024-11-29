@@ -229,7 +229,7 @@ class _MyHomePageState extends State<Home> {
         children: [
           Inicio(),
           Retos(uid: uid),
-          Calendario()
+          Calendario(uid: uid,)
         ],
         onPageChanged: (page) {
           setState(() {

@@ -42,6 +42,7 @@ class _MyHomePageState extends State<Inicio> {
   DateTime? createdDate;
 
 
+
   @override
   Widget build(BuildContext context) {
     final User? user = auth.currentUser;
@@ -84,7 +85,7 @@ class _MyHomePageState extends State<Inicio> {
 
 
 
-                // Cantidad de retos completados
+                // TODO Cantidad de retos completados
                 SizedBox(
                   height: MediaQuery.of(context).size.height*0.3,
                   child: Container(
@@ -172,7 +173,7 @@ class _MyHomePageState extends State<Inicio> {
                   width: MediaQuery.of(context).size.width*0.5,
                   child: Text('Retos\nPendientes', textAlign: TextAlign.center, style: TextStyle(fontSize: 20),),
                 ),
-                // LISTA DE RETOS Sin Completar
+                // TODO LISTA DE RETOS Sin Completar
                 SizedBox(
                   // height: MediaQuery.of(context).size.height*0.6,
                   // width: MediaQuery.of(context).size.width*1,
@@ -209,7 +210,12 @@ class _MyHomePageState extends State<Inicio> {
                               Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
 
                               return ExpansionTileCard(
-                                baseColor: Theme.of(context).colorScheme.onInverseSurface,
+                                baseColor: Color.fromARGB(
+                                  255,
+                                  data['color'][1],
+                                  data['color'][2],
+                                  data['color'][3],
+                                ),
                                 expandedColor: Theme.of(context).colorScheme.onInverseSurface.withBlue(200),
                                 expandedTextColor: Colors.black,
                                 initialPadding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height*0.01),
