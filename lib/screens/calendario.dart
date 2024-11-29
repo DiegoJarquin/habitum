@@ -31,22 +31,29 @@ class _MyCalendarState extends State<Calendario> {
 
     for (QueryDocumentSnapshot document in querySnapshot.docs) {
       final data = document.data() as Map<String, dynamic>;
-      final startDate = data['fechaInicial'].toDate();
-      final endDate = data['fechaFinal'].toDate();
+      if(data.isNotEmpty){
+        final startDate = data['fechaInicial']?.toDate();
+        final endDate = data['fechaFinal']?.toDate();
+        if(endDate!=null){
+          final color = Color.fromARGB(
+            255,
+            data['color'][1],
+            data['color'][2],
+            data['color'][3],
+          );
 
-      final color = Color.fromARGB(
-        255,
-        data['color'][1],
-        data['color'][2],
-        data['color'][3],
-      );
+          _appointments.add(Appointment(
+            startTime: startDate,
+            endTime: endDate,
+            subject: 'My Event',
+            color: color,
+          ));
+        }else{
+          print('endDate is null for this document');
+        }
 
-      _appointments.add(Appointment(
-        startTime: startDate,
-        endTime: endDate,
-        subject: 'My Event',
-        color: color,
-      ));
+      }
+
     }
 
     setState(() {});

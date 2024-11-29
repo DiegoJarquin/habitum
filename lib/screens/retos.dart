@@ -67,6 +67,23 @@ class _RetosState extends State<Retos> {
           .catchError((error) => print("Falla al agregar reto: $error"));
     }
 
+    Future<void> actualizarReto(String docId) {
+
+      return users
+          .doc(docId).update({
+        'titulo': (tituloController.text), // titulo del reto
+        'descripcion': descripcionController.text, // descripcion del reto
+        'fechaInicial': startDate, // Fecha inicial para comenzar el reto
+        'fechaFinal': endDate, // Fecha final para terminar el reto
+        'sinfin': isChecked, //reto infinito
+        'frecuencia': _frecuencia, //frecuencia de repeticion
+        'diasCounter': difference, //dias de duracion del reto
+      })
+          .then((value) => print("reto actualizado"))
+          .catchError((error) => print("Falla al agregar reto: $error"));
+    }
+    
+
     Future<void> completarReto(String docId) {
 
       return users
@@ -262,8 +279,163 @@ class _RetosState extends State<Retos> {
                                       children: <Widget>[
                                         TextButton(
                                           // style: flatButtonStyle,
-                                          onPressed: () {
-                                            // cardB.currentState?.expand();
+                                          onPressed: () async {
+                                            final sd = data['fechaInicial']?.toDate();
+                                            final ed = data['fechaFinal']?.toDate();
+                                            tituloController.text = data['titulo'];
+                                            descripcionController.text = data['descripcion'];
+                                            _frecuencia = data['frecuencia'];
+                                            endDate = ed;
+                                            startDate = sd;
+                                            isChecked = data['sinfin'];
+
+                                            //TODO EDITAR
+                                            return await showDialog(
+                                                context: context,
+                                                builder: (context) {
+
+                                                  return StatefulBuilder(builder: (context, setState) {
+                                                    return AlertDialog(
+                                                      content: Form(
+                                                          key: _formKey,
+                                                          child: Column(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            children: [
+                                                              for (int i = 1; i <= 2; i++)
+                                                                ListTile(
+                                                                  title: Text(
+                                                                    i==1 ? 'Diario' : i== 2 ? 'Semanal' : "",
+                                                                    style: Theme.of(context).textTheme.titleSmall?.copyWith(color: i == 3 ? Colors.black38 : Colors.black),
+                                                                  ),
+                                                                  leading: Radio(
+                                                                    value: i,
+                                                                    groupValue: _frecuencia,
+                                                                    activeColor: const Color(0xFF6200EE),
+                                                                    onChanged: i == 3 ? null : (int? value) {
+                                                                      setState(() {
+                                                                        _frecuencia = value!;
+
+                                                                      });
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                              TextFormField(
+                                                                controller: tituloController,
+                                                                validator: (value) {
+                                                                  return value!.isNotEmpty ? null : "Agregar Nombre";
+                                                                },
+                                                                decoration:
+                                                                const InputDecoration(hintText: "Título"),
+                                                              ),
+                                                              TextFormField(
+                                                                controller: descripcionController,
+                                                                validator: (value) {
+                                                                  return value!.isNotEmpty ? null : "Agregar Descripción";
+                                                                },
+                                                                decoration:
+                                                                const InputDecoration(hintText: "Agregar Descripción"),
+                                                              ),
+                                                              const SizedBox(height: 20),
+                                                              Row(
+                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                children: [
+                                                                  const Text("Hábito sin fin"),
+                                                                  Checkbox(
+                                                                      value: isChecked,
+                                                                      onChanged: (checked) {
+                                                                        setState(() {
+                                                                          isChecked = checked!;
+                                                                        });
+                                                                      })
+                                                                ],
+                                                              ),
+                                                              const SizedBox(height: 20),
+                                                              Visibility(
+                                                                visible: !isChecked,
+                                                                child: FloatingActionButton(
+                                                                  onPressed: () {
+                                                                    showCustomDateRangePicker(
+                                                                      context,
+                                                                      dismissible: true,
+                                                                      minimumDate: DateTime.now(),
+                                                                      maximumDate: DateTime.now().add(const Duration(days: 30)),
+                                                                      endDate: endDate,
+                                                                      startDate: startDate,
+                                                                      backgroundColor: Colors.white,
+                                                                      primaryColor: Colors.green,
+                                                                      onApplyClick: (start, end) {
+                                                                        setState(() {
+                                                                          endDate = end;
+                                                                          startDate = start;
+
+                                                                          if(endDate!=null&&startDate!=null){
+                                                                            difference = endDate!.difference(startDate!).inDays;
+                                                                          }
+
+                                                                        });
+                                                                      },
+                                                                      onCancelClick: () {
+                                                                        setState(() {
+                                                                          endDate = null;
+                                                                          startDate = null;
+                                                                        });
+                                                                      },
+                                                                    );
+                                                                  },
+                                                                  tooltip: 'Seleccionar Fechas',
+                                                                  child: const Icon(Icons.calendar_today_outlined, color: Colors.white),
+                                                                ),
+
+                                                              ),
+
+                                                              (endDate!=null&&!isChecked) ? Text(DateFormat('dd/MM/yyyy').format(startDate!)+" - "+DateFormat('dd/MM/yyyy').format(endDate!)) : Text(""),
+
+
+
+
+                                                            ],
+                                                          )),
+                                                      title: const Text('Agregar Reto'),
+                                                      actions: <Widget>[
+                                                        InkWell(
+                                                          child: const Text('CANCELAR   ', style: TextStyle(fontWeight: FontWeight.bold),),
+                                                          onTap: () {
+
+                                                            Navigator.of(context).pop();
+
+                                                          },
+                                                        ),
+                                                        InkWell(
+                                                          child: const Text('OK   ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                          onTap: () async {
+                                                            if (_formKey.currentState!.validate()&&isChecked) {
+
+
+                                                              if(isChecked){
+                                                                endDate = null;
+                                                                startDate = null;
+                                                              }
+                                                              
+
+                                                              await actualizarReto(document.id);
+
+                                                              Navigator.of(context).pop();
+
+                                                            }else if(_formKey.currentState!.validate()&&endDate!=null){
+                                                              if(endDate!=null&&startDate!=null){
+                                                                difference = endDate!.difference(startDate!).inDays;
+                                                              }
+                                                              await actualizarReto(document.id);
+
+                                                              Navigator.of(context).pop();
+                                                            }
+                                                          },
+                                                        ),
+                                                      ],
+                                                    );
+                                                  });
+                                                });
+
                                           },
                                           child: const Column(
                                             children: <Widget>[
